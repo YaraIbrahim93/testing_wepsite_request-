@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .recipe {
+            margin-bottom: 20px;
+        }
+        .recipe h2 {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recipe List</h1>
+    <div id="recipes"></div>
+    <script>
+        const sheetId = 'YOUR_SHEET_ID';
+        const apiKey = 'YOUR_API_KEY';
+        const range = 'Sheet1!A1:E10'; // Adjust the range according to your sheet
+
+        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
+            .then(response => response.json())
+            .then(data => {
+                const recipes = data.values;
+                const recipesContainer = document.getElementById('recipes');
+                recipes.forEach((recipe, index) => {
+                    if (index === 0) return; // Skip header row
+                    const recipeElement = document.createElement('div');
+                    recipeElement.className = 'recipe';
+                    recipeElement.innerHTML = `
+                        <h2>${recipe[0]}</h2>
+                        <p><strong>Ingredients:</strong> ${recipe[1]}</p>
+                        <p><strong>Instructions:</strong> ${recipe[2]}</p>
+                        <p><strong>Category:</strong> ${recipe[3]}</p>
+                        <p><strong>Tags:</strong> ${recipe[4]}</p>
+                    `;
+                    recipesContainer.appendChild(recipeElement);
+                });
+            });
+    </script>
+</body>
+</html>
