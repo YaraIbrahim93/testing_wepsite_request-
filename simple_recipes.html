@@ -22,16 +22,24 @@
     <h1>Recipe List</h1>
     <div id="recipes"></div>
     <script>
+        const corsProxy = 'https://cors-anywhere.herokuapp.com/';
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR65IMl7mivgc4bdi32JghwkC6lXZqfprPGh3eFtzYKxuq_6s-Vj4w6uFJEG3ukAb1h-Cn8WgbaYV-J/pub?output=csv';
 
-        fetch(sheetUrl)
-            .then(response => response.text())
+        fetch(corsProxy + sheetUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
             .then(text => {
+                console.log('CSV Data:', text);
                 const rows = text.split('\n').slice(1); // Split text by new lines and skip the header row
                 const recipesContainer = document.getElementById('recipes');
 
                 rows.forEach(row => {
                     const cells = row.split(',');
+                    if (cells.length < 5) return; // Skip if the row doesn't have enough columns
                     const recipeElement = document.createElement('div');
                     recipeElement.className = 'recipe';
                     recipeElement.innerHTML = `
@@ -45,8 +53,13 @@
                     recipesContainer.appendChild(recipeElement);
                 });
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                const recipesContainer = document.getElementById('recipes');
+                recipesContainer.innerHTML = `<p>Failed to load data. Please check the console for more information.</p>`;
+            });
     </script>
 </body>
 </html>
+
 
