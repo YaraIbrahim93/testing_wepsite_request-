@@ -22,29 +22,31 @@
     <h1>Recipe List</h1>
     <div id="recipes"></div>
     <script>
-        const sheetId = 'YOUR_SHEET_ID';
-        const apiKey = 'YOUR_API_KEY';
-        const range = 'Sheet1!A1:E10'; // Adjust the range according to your sheet
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR65IMl7mivgc4bdi32JghwkC6lXZqfprPGh3eFtzYKxuq_6s-Vj4w6uFJEG3ukAb1h-Cn8WgbaYV-J/pub?output=csv';
 
-        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
-            .then(response => response.json())
-            .then(data => {
-                const recipes = data.values;
+        fetch(sheetUrl)
+            .then(response => response.text())
+            .then(text => {
+                const rows = text.split('\n').slice(1); // Split text by new lines and skip the header row
                 const recipesContainer = document.getElementById('recipes');
-                recipes.forEach((recipe, index) => {
-                    if (index === 0) return; // Skip header row
+
+                rows.forEach(row => {
+                    const cells = row.split(',');
                     const recipeElement = document.createElement('div');
                     recipeElement.className = 'recipe';
                     recipeElement.innerHTML = `
-                        <h2>${recipe[0]}</h2>
-                        <p><strong>Ingredients:</strong> ${recipe[1]}</p>
-                        <p><strong>Instructions:</strong> ${recipe[2]}</p>
-                        <p><strong>Category:</strong> ${recipe[3]}</p>
-                        <p><strong>Tags:</strong> ${recipe[4]}</p>
+                        <h2>${cells[0]}</h2>
+                        <p><strong>Ingredients:</strong> ${cells[1]}</p>
+                        <p><strong>Instructions:</strong> ${cells[2]}</p>
+                        <p><strong>Category:</strong> ${cells[3]}</p>
+                        <p><strong>Tags:</strong> ${cells[4]}</p>
                     `;
+
                     recipesContainer.appendChild(recipeElement);
                 });
-            });
+            })
+            .catch(error => console.error('Error:', error));
     </script>
 </body>
 </html>
+
